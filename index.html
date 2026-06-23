@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>天图通达 - 运单</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="rail" aria-label="主导航">
+        <div class="rail-spacer"></div>
+        <button class="rail-item active" title="订单">
+          <span class="rail-icon">▣</span>
+          <span>订单</span>
+        </button>
+        <button class="rail-item" title="询价">
+          <span class="rail-icon">?</span>
+          <span>询价</span>
+        </button>
+        <button class="rail-item" title="导出">
+          <span class="rail-icon">↓</span>
+          <span>导出</span>
+        </button>
+        <button class="rail-item" title="配置">
+          <span class="rail-icon">⚙</span>
+          <span>配置</span>
+        </button>
+      </aside>
+
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">
+            <span class="brand-plane"></span>
+            <span class="brand-word">Tiantu</span>
+          </div>
+          <div class="brand-cn">天图通达</div>
+          <div class="brand-slogan">聚焦美英 空海运专线</div>
+        </div>
+        <nav class="menu" aria-label="运单菜单">
+          <a class="menu-link active" href="#">运单</a>
+          <a class="menu-link" href="#">确认数据</a>
+          <a class="menu-link" href="#">账单管理</a>
+          <a class="menu-link" href="#">仓库代码</a>
+          <a class="menu-link" href="#">预警</a>
+        </nav>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="icon-button" title="菜单">☰</button>
+            <button class="icon-button" title="返回">‹</button>
+            <button class="customer-chip">运单(客户)</button>
+          </div>
+          <div class="topbar-right">
+            <button class="icon-button tiny" title="播放">▶</button>
+            <button class="icon-button notify" title="通知">
+              ♧
+              <span class="badge">1</span>
+            </button>
+            <button class="icon-button" title="下载">↓</button>
+            <button class="location-chip" title="定位">⊙</button>
+            <span class="user-icon">♟</span>
+            <button class="account-select">天光跨境物流⌄</button>
+          </div>
+        </header>
+
+        <section class="search-panel" aria-label="查询条件">
+          <div class="keyword-group">
+            <button class="select-prefix">关键字 <span>⌄</span></button>
+            <input type="text" value="" placeholder="输入查询单号，多个用 ',' 隔开" />
+          </div>
+          <label class="field">
+            <span>服务类型</span>
+            <button class="select-field">服务类型 <span>⌄</span></button>
+          </label>
+          <label class="field">
+            <span>运单类型</span>
+            <button class="select-field">运单类型 <span>⌄</span></button>
+          </label>
+          <button class="primary-btn search-btn">
+            <span>⌕</span>
+            查询
+          </button>
+          <button class="ghost-btn">↻ 重置</button>
+          <button class="ghost-btn">⌄ 展开</button>
+        </section>
+
+        <section class="content-card">
+          <div class="watermarks" aria-hidden="true"></div>
+          <div class="tabs-row">
+            <nav class="tabs" aria-label="运单状态">
+              <button class="tab">未传申报</button>
+              <button class="tab">已下单(0)</button>
+              <button class="tab">已收货(3)</button>
+              <button class="tab">已确认(0)</button>
+              <button class="tab">转运中(1)</button>
+              <button class="tab">已签收(1)</button>
+              <button class="tab">退件(0)</button>
+              <button class="tab">已取消(6)</button>
+              <button class="tab active">全部(11)</button>
+            </nav>
+            <div class="status-actions">
+              <button class="danger-btn">不匹配待处理（1）</button>
+              <button class="primary-btn">快捷下单</button>
+              <button class="ghost-btn slim">Excel导入下单</button>
+              <button class="primary-btn">解析发票下单(新版)</button>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="toolbar-main">
+              <button class="danger-btn">取消下单</button>
+              <button class="primary-btn">修改服务</button>
+              <div class="print-label-menu">
+                <button class="primary-btn print-label-toggle" type="button" aria-expanded="false">
+                  打印标签 ⌄
+                </button>
+                <div class="print-label-dropdown" role="menu">
+                  <button type="button" role="menuitem" data-print-label="fba">FBA标签</button>
+                  <button type="button" role="menuitem" data-print-label="system">系统标签</button>
+                </div>
+              </div>
+              <button class="primary-btn">☑ 批量操作 ⌄</button>
+              <button class="primary-btn">查看统计</button>
+              <button class="primary-btn">⊞ 批量添加 ⌄</button>
+              <div class="export-menu">
+                <button class="primary-btn export-toggle" type="button" aria-expanded="false">
+                  导出 ⌄
+                </button>
+                <div class="export-dropdown" role="menu">
+                  <button type="button" role="menuitem" data-export="waybill">导出运单维度</button>
+                  <button type="button" role="menuitem" data-export="box">导出箱子维度</button>
+                  <button type="button" role="menuitem" data-export="tracking">导出运踪维度</button>
+                  <button type="button" role="menuitem" data-export="attachment">附件导出</button>
+                </div>
+              </div>
+              <button class="primary-btn">打印入仓单</button>
+              <button class="primary-btn">报关抬头信息维护</button>
+            </div>
+            <button class="primary-btn gear-btn" title="表格设置">⚙</button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="shipment-table">
+              <thead>
+                <tr>
+                  <th class="check-cell"><input type="checkbox" aria-label="全选" /></th>
+                  <th>运单号</th>
+                  <th>运单类型</th>
+                  <th>国家或地区</th>
+                  <th>服务</th>
+                  <th>应付</th>
+                  <th>收件人</th>
+                  <th>件数</th>
+                  <th>配租状态</th>
+                  <th>标识</th>
+                  <th>申报价值</th>
+                  <th>申报币种</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="shipmentTableBody">
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230001" /></td>
+                  <td><a class="order-link" href="#">TT202606230001</a></td>
+                  <td>空运小包</td>
+                  <td>美国</td>
+                  <td>美线空派-普货</td>
+                  <td class="money">¥ 238.50</td>
+                  <td>Michael Chen</td>
+                  <td>2</td>
+                  <td><span class="status-tag blue">已收货</span></td>
+                  <td><span class="mark-tag">普货</span></td>
+                  <td>128.00</td>
+                  <td>USD</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230002" /></td>
+                  <td><a class="order-link" href="#">TT202606230002</a></td>
+                  <td>海运整箱</td>
+                  <td>英国</td>
+                  <td>英线海运-带电</td>
+                  <td class="money">¥ 1,486.00</td>
+                  <td>Olivia Smith</td>
+                  <td>8</td>
+                  <td><span class="status-tag amber">转运中</span></td>
+                  <td><span class="mark-tag electric">带电</span></td>
+                  <td>760.00</td>
+                  <td>GBP</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230003" /></td>
+                  <td><a class="order-link" href="#">TT202606230003</a></td>
+                  <td>空运专线</td>
+                  <td>加拿大</td>
+                  <td>加线空派-普货</td>
+                  <td class="money">¥ 356.20</td>
+                  <td>Emma White</td>
+                  <td>3</td>
+                  <td><span class="status-tag green">已签收</span></td>
+                  <td><span class="mark-tag">普货</span></td>
+                  <td>210.00</td>
+                  <td>CAD</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230004" /></td>
+                  <td><a class="order-link" href="#">TT202606230004</a></td>
+                  <td>海外仓转运</td>
+                  <td>美国</td>
+                  <td>美西仓派送</td>
+                  <td class="money">¥ 89.00</td>
+                  <td>David Miller</td>
+                  <td>1</td>
+                  <td><span class="status-tag blue">已收货</span></td>
+                  <td><span class="mark-tag">普货</span></td>
+                  <td>45.00</td>
+                  <td>USD</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230005" /></td>
+                  <td><a class="order-link" href="#">TT202606230005</a></td>
+                  <td>空运小包</td>
+                  <td>澳大利亚</td>
+                  <td>澳线空派-敏感</td>
+                  <td class="money">¥ 412.80</td>
+                  <td>Sophia Brown</td>
+                  <td>4</td>
+                  <td><span class="status-tag blue">已收货</span></td>
+                  <td><span class="mark-tag sensitive">敏感</span></td>
+                  <td>320.00</td>
+                  <td>AUD</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230006" /></td>
+                  <td><a class="order-link" href="#">TT202606230006</a></td>
+                  <td>海运散货</td>
+                  <td>美国</td>
+                  <td>美线海派-普货</td>
+                  <td class="money">¥ 928.00</td>
+                  <td>William Lee</td>
+                  <td>6</td>
+                  <td><span class="status-tag gray">已取消</span></td>
+                  <td><span class="mark-tag">普货</span></td>
+                  <td>580.00</td>
+                  <td>USD</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230007" /></td>
+                  <td><a class="order-link" href="#">TT202606230007</a></td>
+                  <td>空运专线</td>
+                  <td>英国</td>
+                  <td>英线空派-普货</td>
+                  <td class="money">¥ 301.60</td>
+                  <td>James Taylor</td>
+                  <td>2</td>
+                  <td><span class="status-tag gray">已取消</span></td>
+                  <td><span class="mark-tag">普货</span></td>
+                  <td>165.00</td>
+                  <td>GBP</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230008" /></td>
+                  <td><a class="order-link" href="#">TT202606230008</a></td>
+                  <td>海外仓转运</td>
+                  <td>德国</td>
+                  <td>德线仓配-普货</td>
+                  <td class="money">¥ 176.40</td>
+                  <td>Ava Martin</td>
+                  <td>1</td>
+                  <td><span class="status-tag gray">已取消</span></td>
+                  <td><span class="mark-tag">普货</span></td>
+                  <td>98.00</td>
+                  <td>EUR</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230009" /></td>
+                  <td><a class="order-link" href="#">TT202606230009</a></td>
+                  <td>空运小包</td>
+                  <td>法国</td>
+                  <td>欧线空派-带电</td>
+                  <td class="money">¥ 255.00</td>
+                  <td>Noah Wilson</td>
+                  <td>2</td>
+                  <td><span class="status-tag gray">已取消</span></td>
+                  <td><span class="mark-tag electric">带电</span></td>
+                  <td>140.00</td>
+                  <td>EUR</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230010" /></td>
+                  <td><a class="order-link" href="#">TT202606230010</a></td>
+                  <td>海运散货</td>
+                  <td>美国</td>
+                  <td>美东海派-大件</td>
+                  <td class="money">¥ 1,236.00</td>
+                  <td>Lucas Davis</td>
+                  <td>9</td>
+                  <td><span class="status-tag gray">已取消</span></td>
+                  <td><span class="mark-tag bulky">大件</span></td>
+                  <td>890.00</td>
+                  <td>USD</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+                <tr>
+                  <td class="check-cell"><input type="checkbox" aria-label="选择运单 TT202606230011" /></td>
+                  <td><a class="order-link" href="#">TT202606230011</a></td>
+                  <td>空运专线</td>
+                  <td>英国</td>
+                  <td>英线空派-敏感</td>
+                  <td class="money">¥ 468.30</td>
+                  <td>Mia Johnson</td>
+                  <td>3</td>
+                  <td><span class="status-tag gray">已取消</span></td>
+                  <td><span class="mark-tag sensitive">敏感</span></td>
+                  <td>280.00</td>
+                  <td>GBP</td>
+                  <td><button class="table-action">查看</button><button class="table-action">编辑</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <span>共 11 条</span>
+            <button class="page-size">100条/页 ⌄</button>
+            <button class="pager" disabled>‹</button>
+            <button class="pager current">1</button>
+            <button class="pager" disabled>›</button>
+            <label class="jump">
+              前往
+              <input type="text" value="1" />
+              页
+            </label>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="system-label-modal" id="systemLabelModal" aria-hidden="true">
+      <div class="system-label-dialog" role="dialog" aria-modal="true" aria-labelledby="systemLabelTitle">
+        <div class="system-label-header">
+          <h3 id="systemLabelTitle">打印标签</h3>
+        </div>
+        <div class="system-label-body">
+          <div class="system-label-watermarks" aria-hidden="true"></div>
+          <div class="system-label-list" id="systemLabelList"></div>
+        </div>
+        <div class="system-label-footer">
+          <div class="download-mode">
+            <span>下载方式：</span>
+            <label>
+              <input type="radio" name="systemLabelDownloadMode" value="split" checked />
+              <span>多票分割</span>
+            </label>
+            <label>
+              <input type="radio" name="systemLabelDownloadMode" value="continuous" />
+              <span>多票连续</span>
+            </label>
+          </div>
+          <div class="system-label-actions">
+            <button class="modal-ghost-btn" type="button" data-system-label-close>取消</button>
+            <button class="modal-primary-btn" type="button" data-system-label-print>打印</button>
+            <button class="modal-primary-btn" type="button" data-system-label-download>下载PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="attachment-export-modal" id="attachmentExportModal" aria-hidden="true">
+      <div class="attachment-export-dialog" role="dialog" aria-modal="true" aria-labelledby="attachmentExportTitle">
+        <div class="attachment-export-header">
+          <h3 id="attachmentExportTitle">附件导出</h3>
+        </div>
+        <div class="attachment-export-body">
+          <div class="attachment-type-row">
+            <span class="attachment-type-label"><span>*</span>附件类型：</span>
+            <div class="attachment-type-grid">
+              <label><input type="checkbox" value="底单" />底单</label>
+              <label><input type="checkbox" value="提单" />提单</label>
+              <label><input type="checkbox" value="POD" />POD</label>
+              <label><input type="checkbox" value="ISA" />ISA</label>
+            </div>
+          </div>
+        </div>
+        <div class="attachment-export-footer">
+          <button class="modal-primary-btn" type="button" data-attachment-export-confirm>确定</button>
+          <button class="modal-ghost-btn" type="button" data-attachment-export-cancel>取消</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
