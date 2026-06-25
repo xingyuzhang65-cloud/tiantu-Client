@@ -450,7 +450,7 @@ function downloadSystemLabels() {
     return;
   }
 
-  const mode = document.querySelector('input[name="systemLabelDownloadMode"]:checked')?.value || "split";
+  const mode = document.querySelector('input[name="systemLabelDownloadMode"]:checked')?.value || "continuous";
   const orderName = selectedShipments.map((shipment) => safeFileName(shipment.orderNo)).join(",");
 
   if (selectedShipments.length > 1 && mode === "split") {
