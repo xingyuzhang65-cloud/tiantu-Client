@@ -72,7 +72,7 @@ function activateClientView(view, { updateHash = true } = {}) {
   if (isOverseasView && overseasFrame) {
     overseasFrame.title = config.title.replace("(客户)", "");
     if (!overseasFrame.getAttribute("src")) {
-      overseasFrame.src = `/overseas-app/?view=${config.frameView}`;
+      overseasFrame.src = `overseas-app/?view=${config.frameView}`;
     } else {
       sendOverseasView(nextView);
     }
