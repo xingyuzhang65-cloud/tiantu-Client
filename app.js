@@ -9,7 +9,87 @@ const systemLabelList = document.querySelector("#systemLabelList");
 const systemLabelWatermarkLayer = document.querySelector(".system-label-watermarks");
 const attachmentExportModal = document.querySelector("#attachmentExportModal");
 const toast = document.querySelector("#toast");
+const workspace = document.querySelector(".workspace");
+const customerChip = document.querySelector(".customer-chip");
+const overseasHost = document.querySelector("#overseasHost");
+const overseasFrame = document.querySelector("#overseasFrame");
+const clientViewLinks = Array.from(document.querySelectorAll("[data-client-view]"));
+const clientViewConfig = {
+  waybill: {
+    hash: "#waybill",
+    title: "运单(客户)",
+    documentTitle: "天图通达 - 运单",
+  },
+  storage: {
+    hash: "#overseas-storage",
+    title: "海外暂存(客户)",
+    documentTitle: "天图通达 - 海外暂存",
+    frameView: "storage",
+  },
+  transit: {
+    hash: "#overseas-transit",
+    title: "海外中转单(客户)",
+    documentTitle: "天图通达 - 海外中转单",
+    frameView: "transit",
+  },
+};
+let activeClientView = "waybill";
 let toastTimer;
+
+function sendOverseasView(view) {
+  if (!overseasFrame?.contentWindow || !clientViewConfig[view]?.frameView) return;
+
+  overseasFrame.contentWindow.postMessage(
+    {
+      type: "tiantu-overseas-view",
+      view: clientViewConfig[view].frameView,
+    },
+    window.location.origin
+  );
+}
+
+function activateClientView(view, { updateHash = true } = {}) {
+  const nextView = clientViewConfig[view] ? view : "waybill";
+  const config = clientViewConfig[nextView];
+  const isOverseasView = nextView !== "waybill";
+  activeClientView = nextView;
+
+  workspace?.classList.toggle("overseas-mode", isOverseasView);
+  if (overseasHost) overseasHost.hidden = !isOverseasView;
+  if (customerChip) customerChip.textContent = config.title;
+  document.title = config.documentTitle;
+
+  clientViewLinks.forEach((link) => {
+    const isActive = link.dataset.clientView === nextView;
+    link.classList.toggle("active", isActive);
+    if (isActive) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+
+  if (isOverseasView && overseasFrame) {
+    overseasFrame.title = config.title.replace("(客户)", "");
+    if (!overseasFrame.getAttribute("src")) {
+      overseasFrame.src = `/overseas-app/?view=${config.frameView}`;
+    } else {
+      sendOverseasView(nextView);
+    }
+  } else {
+    window.requestAnimationFrame(renderWatermarks);
+  }
+
+  if (updateHash && window.location.hash !== config.hash) {
+    window.history.replaceState(null, "", config.hash);
+  }
+}
+
+function getClientViewFromHash() {
+  if (window.location.hash === clientViewConfig.storage.hash) return "storage";
+  if (window.location.hash === clientViewConfig.transit.hash) return "transit";
+  return "waybill";
+}
 
 function renderWatermarks() {
   if (!watermarkLayer) return;
@@ -450,7 +530,7 @@ function downloadSystemLabels() {
     return;
   }
 
-  const mode = document.querySelector('input[name="systemLabelDownloadMode"]:checked')?.value || "continuous";
+  const mode = document.querySelector('input[name="systemLabelDownloadMode"]:checked')?.value || "split";
   const orderName = selectedShipments.map((shipment) => safeFileName(shipment.orderNo)).join(",");
 
   if (selectedShipments.length > 1 && mode === "split") {
@@ -534,6 +614,27 @@ document.querySelectorAll(".tab").forEach((tab) => {
     document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
     tab.classList.add("active");
   });
+});
+
+clientViewLinks.forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    activateClientView(link.dataset.clientView);
+  });
+});
+
+overseasFrame?.addEventListener("load", () => {
+  sendOverseasView(activeClientView);
+});
+
+window.addEventListener("message", (event) => {
+  if (event.origin !== window.location.origin) return;
+  if (event.data?.type !== "tiantu-overseas-ready") return;
+  sendOverseasView(activeClientView);
+});
+
+window.addEventListener("hashchange", () => {
+  activateClientView(getClientViewFromHash(), { updateHash: false });
 });
 
 exportToggle?.addEventListener("click", (event) => {
@@ -624,3 +725,4 @@ document.querySelector(".shipment-table thead input[type='checkbox']")?.addEvent
 window.addEventListener("resize", renderWatermarks);
 window.addEventListener("load", renderWatermarks);
 renderWatermarks();
+activateClientView(getClientViewFromHash(), { updateHash: false });
