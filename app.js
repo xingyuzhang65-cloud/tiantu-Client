@@ -14,19 +14,24 @@ const customerChip = document.querySelector(".customer-chip");
 const overseasHost = document.querySelector("#overseasHost");
 const overseasFrame = document.querySelector("#overseasFrame");
 const clientViewLinks = Array.from(document.querySelectorAll("[data-client-view]"));
+const clientModuleButtons = Array.from(document.querySelectorAll("[data-client-module]"));
+const clientMenuPanels = Array.from(document.querySelectorAll("[data-menu-panel]"));
 const clientViewConfig = {
   waybill: {
+    module: "orders",
     hash: "#waybill",
     title: "运单(客户)",
     documentTitle: "天图通达 - 运单",
   },
   storage: {
+    module: "overseas",
     hash: "#overseas-storage",
     title: "海外暂存(客户)",
     documentTitle: "天图通达 - 海外暂存",
     frameView: "storage",
   },
   transit: {
+    module: "overseas",
     hash: "#overseas-transit",
     title: "海外中转单(客户)",
     documentTitle: "天图通达 - 海外中转单",
@@ -35,6 +40,17 @@ const clientViewConfig = {
 };
 let activeClientView = "waybill";
 let toastTimer;
+
+function activateClientModule(module) {
+  clientModuleButtons.forEach((button) => {
+    const isActive = button.dataset.clientModule === module;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+  clientMenuPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.menuPanel !== module;
+  });
+}
 
 function sendOverseasView(view) {
   if (!overseasFrame?.contentWindow || !clientViewConfig[view]?.frameView) return;
@@ -53,6 +69,8 @@ function activateClientView(view, { updateHash = true } = {}) {
   const config = clientViewConfig[nextView];
   const isOverseasView = nextView !== "waybill";
   activeClientView = nextView;
+
+  activateClientModule(config.module);
 
   workspace?.classList.toggle("overseas-mode", isOverseasView);
   if (overseasHost) overseasHost.hidden = !isOverseasView;
@@ -620,6 +638,12 @@ clientViewLinks.forEach((link) => {
   link.addEventListener("click", (event) => {
     event.preventDefault();
     activateClientView(link.dataset.clientView);
+  });
+});
+
+clientModuleButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activateClientView(button.dataset.clientModule === "overseas" ? "storage" : "waybill");
   });
 });
 

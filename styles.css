@@ -89,6 +89,18 @@ button {
   background: #d9e9f7;
 }
 
+.rail-item-overseas {
+  height: 66px;
+  padding: 5px 3px;
+}
+
+.rail-label {
+  max-width: 44px;
+  text-align: center;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
 .rail-icon {
   display: grid;
   width: 18px;
@@ -182,6 +194,10 @@ button {
 .menu-link.active {
   color: var(--blue);
   background: linear-gradient(90deg, rgba(7, 81, 175, 0) 0%, rgba(7, 81, 175, 0.06) 100%);
+}
+
+.menu-panel[hidden] {
+  display: none;
 }
 
 .menu-link-module {

@@ -10,9 +10,19 @@
     <div class="app-shell">
       <aside class="rail" aria-label="主导航">
         <div class="rail-spacer"></div>
-        <button class="rail-item active" title="订单">
+        <button class="rail-item active" type="button" title="订单" data-client-module="orders" aria-pressed="true">
           <span class="rail-icon">▣</span>
           <span>订单</span>
+        </button>
+        <button
+          class="rail-item rail-item-overseas"
+          type="button"
+          title="海外中转单管理"
+          data-client-module="overseas"
+          aria-pressed="false"
+        >
+          <span class="rail-icon">⇄</span>
+          <span class="rail-label">海外中转单管理</span>
         </button>
         <button class="rail-item" title="询价">
           <span class="rail-icon">?</span>
@@ -37,14 +47,16 @@
           <div class="brand-cn">天图通达</div>
           <div class="brand-slogan">聚焦美英 空海运专线</div>
         </div>
-        <nav class="menu" aria-label="客户端菜单">
+        <nav class="menu menu-panel" aria-label="订单菜单" data-menu-panel="orders">
           <a class="menu-link active" href="#waybill" data-client-view="waybill">运单</a>
-          <a class="menu-link menu-link-module" href="#overseas-storage" data-client-view="storage">海外暂存</a>
-          <a class="menu-link menu-link-module" href="#overseas-transit" data-client-view="transit">海外中转单</a>
           <a class="menu-link" href="#">确认数据</a>
           <a class="menu-link" href="#">账单管理</a>
           <a class="menu-link" href="#">仓库代码</a>
           <a class="menu-link" href="#">预警</a>
+        </nav>
+        <nav class="menu menu-panel" aria-label="海外中转单管理菜单" data-menu-panel="overseas" hidden>
+          <a class="menu-link menu-link-module" href="#overseas-storage" data-client-view="storage">海外暂存</a>
+          <a class="menu-link menu-link-module" href="#overseas-transit" data-client-view="transit">海外中转单</a>
         </nav>
       </aside>
 
