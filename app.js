@@ -16,6 +16,7 @@ const overseasFrame = document.querySelector("#overseasFrame");
 const clientViewLinks = Array.from(document.querySelectorAll("[data-client-view]"));
 const clientModuleButtons = Array.from(document.querySelectorAll("[data-client-module]"));
 const clientMenuPanels = Array.from(document.querySelectorAll("[data-menu-panel]"));
+const overseasEmbedPath = "overseas-app/embed.html";
 const clientViewConfig = {
   waybill: {
     module: "orders",
@@ -40,6 +41,23 @@ const clientViewConfig = {
 };
 let activeClientView = "waybill";
 let toastTimer;
+let overseasReadyTimer;
+
+function setOverseasFrameState(state) {
+  if (!overseasHost) return;
+
+  overseasHost.classList.toggle("is-ready", state === "ready");
+  overseasHost.classList.toggle("is-error", state === "error");
+  overseasHost.setAttribute("aria-busy", String(state === "loading"));
+}
+
+function waitForOverseasFrameReady() {
+  window.clearTimeout(overseasReadyTimer);
+  setOverseasFrameState("loading");
+  overseasReadyTimer = window.setTimeout(() => {
+    setOverseasFrameState("error");
+  }, 8000);
+}
 
 function activateClientModule(module) {
   clientModuleButtons.forEach((button) => {
@@ -90,7 +108,8 @@ function activateClientView(view, { updateHash = true } = {}) {
   if (isOverseasView && overseasFrame) {
     overseasFrame.title = config.title.replace("(客户)", "");
     if (!overseasFrame.getAttribute("src")) {
-      overseasFrame.src = `overseas-app/?view=${config.frameView}`;
+      waitForOverseasFrameReady();
+      overseasFrame.src = `${overseasEmbedPath}?view=${config.frameView}`;
     } else {
       sendOverseasView(nextView);
     }
@@ -653,7 +672,10 @@ overseasFrame?.addEventListener("load", () => {
 
 window.addEventListener("message", (event) => {
   if (event.origin !== window.location.origin) return;
+  if (event.source !== overseasFrame?.contentWindow) return;
   if (event.data?.type !== "tiantu-overseas-ready") return;
+  window.clearTimeout(overseasReadyTimer);
+  setOverseasFrameState("ready");
   sendOverseasView(activeClientView);
 });
 

@@ -228,6 +228,7 @@ button {
 }
 
 .overseas-host {
+  position: relative;
   min-height: 0;
   flex: 1;
   margin: 12px 11px 10px;
@@ -236,6 +237,31 @@ button {
   border-radius: 4px;
   background: #fff;
   box-shadow: 0 2px 8px rgba(14, 39, 76, 0.14);
+}
+
+.overseas-host::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  background: #f7f9fc;
+  color: #65758b;
+  content: "正在加载海外业务…";
+  font-size: 14px;
+}
+
+.overseas-host.is-ready::before {
+  display: none;
+}
+
+.overseas-host.is-error::before {
+  color: #c43b3b;
+  content: "海外业务页面加载失败，请刷新后重试";
+}
+
+.overseas-host:not(.is-ready) .overseas-frame {
+  visibility: hidden;
 }
 
 .overseas-host[hidden] {
