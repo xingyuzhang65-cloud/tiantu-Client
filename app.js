@@ -9,124 +9,61 @@ const systemLabelList = document.querySelector("#systemLabelList");
 const systemLabelWatermarkLayer = document.querySelector(".system-label-watermarks");
 const attachmentExportModal = document.querySelector("#attachmentExportModal");
 const toast = document.querySelector("#toast");
-const workspace = document.querySelector(".workspace");
-const customerChip = document.querySelector(".customer-chip");
-const overseasHost = document.querySelector("#overseasHost");
-const overseasFrame = document.querySelector("#overseasFrame");
-const clientViewLinks = Array.from(document.querySelectorAll("[data-client-view]"));
-const clientModuleButtons = Array.from(document.querySelectorAll("[data-client-module]"));
-const clientMenuPanels = Array.from(document.querySelectorAll("[data-menu-panel]"));
-const overseasEmbedPath = "overseas-app/embed.html";
-const clientViewConfig = {
-  waybill: {
-    module: "orders",
-    hash: "#waybill",
-    title: "运单(客户)",
-    documentTitle: "天图通达 - 运单",
-  },
-  storage: {
-    module: "overseas",
-    hash: "#overseas-storage",
-    title: "海外暂存(客户)",
-    documentTitle: "天图通达 - 海外暂存",
-    frameView: "storage",
-  },
-  transit: {
-    module: "overseas",
-    hash: "#overseas-transit",
-    title: "海外中转单(客户)",
-    documentTitle: "天图通达 - 海外中转单",
-    frameView: "transit",
-  },
-};
-let activeClientView = "waybill";
 let toastTimer;
-let overseasReadyTimer;
 
-function setOverseasFrameState(state) {
-  if (!overseasHost) return;
+const clientViews = {
+  waybill: {module:'orders', hash:'#waybill', title:'运单(客户)'},
+  storage: {module:'overseas', hash:'#overseas-storage', title:'暂存管理'},
+  instructions: {module:'overseas', hash:'#instruction-list', title:'指令列表'},
+};
+const overseasFrame = document.querySelector('#overseasFrame');
+const overseasHost = document.querySelector('#overseasHost');
+let frameReadyTimer;
+let currentFrameView = '';
 
-  overseasHost.classList.toggle("is-ready", state === "ready");
-  overseasHost.classList.toggle("is-error", state === "error");
-  overseasHost.setAttribute("aria-busy", String(state === "loading"));
-}
-
-function waitForOverseasFrameReady() {
-  window.clearTimeout(overseasReadyTimer);
-  setOverseasFrameState("loading");
-  overseasReadyTimer = window.setTimeout(() => {
-    setOverseasFrameState("error");
-  }, 8000);
-}
-
-function activateClientModule(module) {
-  clientModuleButtons.forEach((button) => {
-    const isActive = button.dataset.clientModule === module;
-    button.classList.toggle("active", isActive);
-    button.setAttribute("aria-pressed", String(isActive));
+function activateClientView(view) {
+  const config = clientViews[view] || clientViews.waybill;
+  const isOverseas = config.module === 'overseas';
+  document.querySelectorAll('[data-client-module]').forEach(button => {
+    const active = button.dataset.clientModule === config.module;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
   });
-  clientMenuPanels.forEach((panel) => {
-    panel.hidden = panel.dataset.menuPanel !== module;
+  document.querySelectorAll('[data-menu-panel]').forEach(panel => panel.hidden=panel.dataset.menuPanel !== config.module);
+  document.querySelectorAll('[data-client-view]').forEach(link => {
+    const active = clientViews[link.dataset.clientView] === config;
+    link.classList.toggle('active',active);
+    if(active) link.setAttribute('aria-current','page'); else link.removeAttribute('aria-current');
   });
-}
-
-function sendOverseasView(view) {
-  if (!overseasFrame?.contentWindow || !clientViewConfig[view]?.frameView) return;
-
-  overseasFrame.contentWindow.postMessage(
-    {
-      type: "tiantu-overseas-view",
-      view: clientViewConfig[view].frameView,
-    },
-    window.location.origin
-  );
-}
-
-function activateClientView(view, { updateHash = true } = {}) {
-  const nextView = clientViewConfig[view] ? view : "waybill";
-  const config = clientViewConfig[nextView];
-  const isOverseasView = nextView !== "waybill";
-  activeClientView = nextView;
-
-  activateClientModule(config.module);
-
-  workspace?.classList.toggle("overseas-mode", isOverseasView);
-  if (overseasHost) overseasHost.hidden = !isOverseasView;
-  if (customerChip) customerChip.textContent = config.title;
-  document.title = config.documentTitle;
-
-  clientViewLinks.forEach((link) => {
-    const isActive = link.dataset.clientView === nextView;
-    link.classList.toggle("active", isActive);
-    if (isActive) {
-      link.setAttribute("aria-current", "page");
-    } else {
-      link.removeAttribute("aria-current");
-    }
-  });
-
-  if (isOverseasView && overseasFrame) {
-    overseasFrame.title = config.title.replace("(客户)", "");
-    if (!overseasFrame.getAttribute("src")) {
-      waitForOverseasFrameReady();
-      overseasFrame.src = `${overseasEmbedPath}?view=${config.frameView}`;
-    } else {
-      sendOverseasView(nextView);
-    }
-  } else {
-    window.requestAnimationFrame(renderWatermarks);
+  document.querySelector('.workspace').classList.toggle('overseas-mode',isOverseas);
+  overseasHost.hidden = !isOverseas;
+  document.querySelector('.customer-chip').textContent = config.title;
+  document.title = '天图通达 - '+config.title.replace('(客户)','');
+  if (location.hash !== config.hash) history.replaceState(null,'',config.hash);
+  if (isOverseas && currentFrameView !== config.hash) {
+    currentFrameView = config.hash;
+    overseasHost.classList.remove('is-ready');
+    overseasHost.setAttribute('aria-busy','true');
+    overseasHost.querySelector('[role="status"]').textContent='正在加载页面…';
+    overseasFrame.title=config.title;
+    overseasFrame.src='overseas-app/index.html?view='+view+config.hash;
+    clearTimeout(frameReadyTimer);
+    frameReadyTimer=setTimeout(()=>{
+      overseasHost.querySelector('[role="status"]').textContent='页面加载失败，请刷新重试';
+      overseasHost.setAttribute('aria-busy','false');
+    },15000);
   }
-
-  if (updateHash && window.location.hash !== config.hash) {
-    window.history.replaceState(null, "", config.hash);
-  }
+  if (!isOverseas) requestAnimationFrame(renderWatermarks);
 }
-
-function getClientViewFromHash() {
-  if (window.location.hash === clientViewConfig.storage.hash) return "storage";
-  if (window.location.hash === clientViewConfig.transit.hash) return "transit";
-  return "waybill";
+function activateViewFromHash() {
+  activateClientView(Object.keys(clientViews).find(view=>clientViews[view].hash===location.hash)||'waybill');
 }
+window.addEventListener('message',event=>{
+  if(event.origin!==location.origin || event.source!==overseasFrame.contentWindow || event.data?.type!=='tiantu-overseas-ready' || event.data.view!==currentFrameView) return;
+  clearTimeout(frameReadyTimer);
+  overseasHost.classList.add('is-ready');
+  overseasHost.setAttribute('aria-busy','false');
+});
 
 function renderWatermarks() {
   if (!watermarkLayer) return;
@@ -653,35 +590,13 @@ document.querySelectorAll(".tab").forEach((tab) => {
   });
 });
 
-clientViewLinks.forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    activateClientView(link.dataset.clientView);
-  });
-});
-
-clientModuleButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    activateClientView(button.dataset.clientModule === "overseas" ? "storage" : "waybill");
-  });
-});
-
-overseasFrame?.addEventListener("load", () => {
-  sendOverseasView(activeClientView);
-});
-
-window.addEventListener("message", (event) => {
-  if (event.origin !== window.location.origin) return;
-  if (event.source !== overseasFrame?.contentWindow) return;
-  if (event.data?.type !== "tiantu-overseas-ready") return;
-  window.clearTimeout(overseasReadyTimer);
-  setOverseasFrameState("ready");
-  sendOverseasView(activeClientView);
-});
-
-window.addEventListener("hashchange", () => {
-  activateClientView(getClientViewFromHash(), { updateHash: false });
-});
+document.querySelectorAll('[data-client-view]').forEach(link=>link.addEventListener('click',event=>{
+  event.preventDefault(); activateClientView(link.dataset.clientView);
+}));
+document.querySelectorAll('[data-client-module]').forEach(button=>button.addEventListener('click',()=>{
+  activateClientView(button.dataset.clientModule==='overseas'?'storage':'waybill');
+}));
+window.addEventListener('hashchange',activateViewFromHash);
 
 exportToggle?.addEventListener("click", (event) => {
   event.stopPropagation();
@@ -771,4 +686,4 @@ document.querySelector(".shipment-table thead input[type='checkbox']")?.addEvent
 window.addEventListener("resize", renderWatermarks);
 window.addEventListener("load", renderWatermarks);
 renderWatermarks();
-activateClientView(getClientViewFromHash(), { updateHash: false });
+activateViewFromHash();

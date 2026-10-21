@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>天图通达 - 运单</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=client-20261021" />
   </head>
   <body>
     <div class="app-shell">
@@ -14,13 +14,7 @@
           <span class="rail-icon">▣</span>
           <span>订单</span>
         </button>
-        <button
-          class="rail-item rail-item-overseas"
-          type="button"
-          title="海外中转单管理"
-          data-client-module="overseas"
-          aria-pressed="false"
-        >
+        <button class="rail-item rail-item-overseas" type="button" title="海外中转单管理" data-client-module="overseas" aria-pressed="false">
           <span class="rail-icon">⇄</span>
           <span class="rail-label">海外中转单管理</span>
         </button>
@@ -55,8 +49,8 @@
           <a class="menu-link" href="#">预警</a>
         </nav>
         <nav class="menu menu-panel" aria-label="海外中转单管理菜单" data-menu-panel="overseas" hidden>
-          <a class="menu-link menu-link-module" href="#overseas-storage" data-client-view="storage">海外暂存</a>
-          <a class="menu-link menu-link-module" href="#overseas-transit" data-client-view="transit">海外中转单</a>
+          <a class="menu-link" href="#overseas-storage" data-client-view="storage">暂存管理</a>
+          <a class="menu-link" href="#instruction-list" data-client-view="instructions">指令列表</a>
         </nav>
       </aside>
 
@@ -80,13 +74,9 @@
           </div>
         </header>
 
-        <section class="overseas-host" id="overseasHost" aria-label="海外业务客户端" hidden>
-          <iframe
-            class="overseas-frame"
-            id="overseasFrame"
-            title="海外暂存"
-            referrerpolicy="same-origin"
-          ></iframe>
+        <section class="overseas-host" id="overseasHost" aria-label="海外业务页面" hidden>
+          <p class="overseas-status" role="status">正在加载页面…</p>
+          <iframe id="overseasFrame" title="暂存管理" referrerpolicy="same-origin"></iframe>
         </section>
 
         <section class="search-panel" aria-label="查询条件">
@@ -421,6 +411,6 @@
       </div>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="app.js"></script>
+    <script src="app.js?v=client-20261021"></script>
   </body>
 </html>
