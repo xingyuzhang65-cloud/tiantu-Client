@@ -30,7 +30,7 @@
   function limitInstructionActions() {
     const toolbar = document.querySelector('main[aria-label="指令列表"] > section:nth-child(2) > div:nth-child(2)');
     toolbar?.querySelectorAll('button').forEach(button => {
-      if (allowedActions.has(button.textContent.trim())) {
+      if (allowedActions.has(button.textContent.trim()) || button.dataset.clientAction === "cancel-pending") {
         if (!button.hasAttribute('data-client-kept-action')) button.setAttribute('data-client-kept-action','');
       } else if (button.hasAttribute('data-client-kept-action')) button.removeAttribute('data-client-kept-action');
     });
