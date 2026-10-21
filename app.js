@@ -46,7 +46,7 @@ function activateClientView(view) {
     overseasHost.setAttribute('aria-busy','true');
     overseasHost.querySelector('[role="status"]').textContent='正在加载页面…';
     overseasFrame.title=config.title;
-    overseasFrame.src='overseas-app/index.html?view='+view+config.hash;
+    overseasFrame.src='overseas-app/index.html?view='+view+'&v=cancel-order-20261021'+config.hash;
     clearTimeout(frameReadyTimer);
     frameReadyTimer=setTimeout(()=>{
       overseasHost.querySelector('[role="status"]').textContent='页面加载失败，请刷新重试';
