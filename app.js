@@ -13,6 +13,7 @@ let toastTimer;
 
 const clientViews = {
   waybill: {module:'orders', hash:'#waybill', title:'运单(客户)'},
+  intercept: {module:'overseas', hash:'#overseas-intercept', title:'拦截管理', framePage:'intercept.html'},
   storage: {module:'overseas', hash:'#overseas-storage', title:'暂存管理'},
   instructions: {module:'overseas', hash:'#instruction-list', title:'指令列表'},
 };
@@ -46,7 +47,8 @@ function activateClientView(view) {
     overseasHost.setAttribute('aria-busy','true');
     overseasHost.querySelector('[role="status"]').textContent='正在加载页面…';
     overseasFrame.title=config.title;
-    overseasFrame.src='overseas-app/index.html?view='+view+'&v=status-ordered-20261021'+config.hash;
+    const framePage = config.framePage || 'index.html';
+    overseasFrame.src='overseas-app/'+framePage+'?view='+view+'&v=overseas-intercept-20261120'+config.hash;
     clearTimeout(frameReadyTimer);
     frameReadyTimer=setTimeout(()=>{
       overseasHost.querySelector('[role="status"]').textContent='页面加载失败，请刷新重试';
@@ -59,7 +61,12 @@ function activateViewFromHash() {
   activateClientView(Object.keys(clientViews).find(view=>clientViews[view].hash===location.hash)||'waybill');
 }
 window.addEventListener('message',event=>{
-  if(event.origin!==location.origin || event.source!==overseasFrame.contentWindow || event.data?.type!=='tiantu-overseas-ready' || event.data.view!==currentFrameView) return;
+  if(event.origin!==location.origin || event.source!==overseasFrame.contentWindow || event.data?.view!==currentFrameView) return;
+  if(event.data.type==='tiantu-open-overseas-storage' && currentFrameView===clientViews.intercept.hash && !overseasHost.hidden) {
+    activateClientView('storage');
+    return;
+  }
+  if(event.data.type!=='tiantu-overseas-ready') return;
   clearTimeout(frameReadyTimer);
   overseasHost.classList.add('is-ready');
   overseasHost.setAttribute('aria-busy','false');

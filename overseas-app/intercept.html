@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>拦截管理</title>
+    <link rel="stylesheet" href="assets/index-DsSRBec1.css" />
+    <style>
+      /* The client shell supplies the navigation and header. */
+      html, body, #root { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+      #root > div > div:first-child,
+      #root > div > div:nth-child(2) > div:first-child,
+      #root > div > div:nth-child(2) > div.select-none { display: none !important; }
+    </style>
+    <script type="module" src="assets/index-DQ7VLrqS.js?v=client-intercept-actions-20261120"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      const interceptHash = '#overseas-intercept';
+      let needsReferenceFixtures = true;
+      try {
+        const tasks = JSON.parse(localStorage.getItem('tiantu-intercept-tasks-v1'));
+        needsReferenceFixtures = !tasks?.some(task => task.no.startsWith('MOCK-INT-'));
+      } catch { /* Follow the reference startup when storage is unavailable. */ }
+
+      // The reference seeds its demo records before opening the menu from reserved orders.
+      const startingHash = needsReferenceFixtures ? '#reserved-orders' : interceptHash;
+      if (location.hash !== startingHash) history.replaceState(null, '', startingHash);
+
+      const root = document.getElementById('root');
+      let ready = false;
+      const viewObserver = new MutationObserver(() => {
+        if (needsReferenceFixtures) {
+          const interceptMenu = document.getElementById('submenu-item-拦截管理');
+          if (!interceptMenu) return;
+          needsReferenceFixtures = false;
+          interceptMenu.click();
+        }
+        if (!ready && root.querySelector('.mc-intercept-page')) {
+          ready = true;
+          window.parent.postMessage({type: 'tiantu-overseas-ready', view: interceptHash}, location.origin);
+        }
+        // The reference app changes its hash via replaceState when opening a storage record.
+        if (ready && location.hash === '#overseas-storage') {
+          window.parent.postMessage({type: 'tiantu-open-overseas-storage', view: interceptHash}, location.origin);
+          viewObserver.disconnect();
+        }
+      });
+      viewObserver.observe(root, {childList: true, subtree: true});
+    </script>
+  </body>
+</html>
